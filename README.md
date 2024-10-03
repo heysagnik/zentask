@@ -20,17 +20,57 @@ Features to be implemented :
 
 ## Getting Started
 
-First, run the development server:
+## Prerequisites
+Before running this project, some tools need to be installed.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 1. Node.js
+
+If `Node.js` is not installed, follow the steps,
+
+**For Windows:**
+  1. Go to the [Node.js official website](https://nodejs.org).
+  2. Click on the **LTS** (Long-Term Support) version to download the installer.
+  3. Run the installer and follow the prompts. Make sure to check the box that says **Add to PATH** during installation.
+
+### 2. Verify Node.js and npm Installation
+
+Check is `Node.js` and `npm` are correctly installed:
+
+1. Open Command Prompt
+2. Check `Node.js`:
+   ```bash
+   node -v
+   ```
+3. Check `npm`:
+   ```bash
+   npm -v
+   ```
+If they are insatall procced to next step. 
+
+## Running on Local Machine
+1. Open terminal
+2. Clone the repository
+    ```bash
+    git clone https://github.com/heysagnik/zentask.git
+    ```
+3. Change into the project directory
+    ```bash
+    cd zentask
+    ```
+4. Install Dependencies
+    ```bash
+    npm install
+    ```
+5. Run the development server:
+    ```bash
+    npm run dev
+    # or
+    yarn dev
+    # or
+    pnpm dev
+    # or
+    bun dev
+    ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
