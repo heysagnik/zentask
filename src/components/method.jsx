@@ -42,7 +42,6 @@ const EisenhowerMatrix = () => {
     const copyListItems = [...todos];
     const dragItemContent = copyListItems[dragItem.current];
 
-    // Prevent items from being moved out of the "Delete" quadrant
     if (dragItemContent.quadrant === 'delete' && quadrant !== 'delete') {
       return;
     }
@@ -76,16 +75,18 @@ const EisenhowerMatrix = () => {
 
   const handleCompleteTodo = (index) => {
     const newTodos = [...todos];
-    newTodos[index].completed = true;
-    newTodos[index].quadrant = 'delete';
+    if (newTodos[index].completed) {
+      newTodos[index].quadrant = newTodos[index].originalQuadrant;
+      newTodos[index].completed = false;
+      newTodos[index].originalQuadrant = undefined;
+    } else {
+
+      newTodos[index].originalQuadrant = newTodos[index].quadrant;
+      newTodos[index].quadrant = 'delete';
+      newTodos[index].completed = true;
+    }
     setTodos(newTodos);
   };
-
-//   const handleDeleteTodo = (index) => {
-//     const newTodos = [...todos];
-//     newTodos.splice(index, 1);
-//     setTodos(newTodos);
-//   };
 
   const handleDeleteAll = () => {
     const newTodos = todos.filter(todo => todo.quadrant !== 'delete');
@@ -104,7 +105,7 @@ const EisenhowerMatrix = () => {
   };
 
   const renderQuadrant = (title, quadrant) => (
-    <div 
+    <div
       className="border p-1 h-64 overflow-hidden rounded-lg" // Adjusted height
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => handleDrop(e, quadrant)}
@@ -134,7 +135,6 @@ const EisenhowerMatrix = () => {
                     type="checkbox"
                     checked={todo.completed}
                     onChange={() => handleCompleteTodo(todos.indexOf(todo))}
-                    disabled={todo.quadrant === 'delete'}
                   />
                   <span className="checkbox">
                     <svg viewBox="0 0 24 24">
@@ -142,7 +142,6 @@ const EisenhowerMatrix = () => {
                     </svg>
                   </span>
                 </label>
-                
               </div>
             </div>
             {todo.time && (
@@ -165,10 +164,8 @@ const EisenhowerMatrix = () => {
       </div>
       <div className="flex-grow grid grid-cols-2 grid-rows-2 gap-2 overflow-hidden"> {/* Adjusted gap */}
         <div className="flex flex-col">
-          
           {renderQuadrant("Do", "do")}
           {renderQuadrant("Delegate", "delegate")}
-          
         </div>
         <div className="flex flex-col">
           {renderQuadrant("Schedule", "schedule")}
