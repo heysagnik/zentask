@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, MouseEvent } from 'react';
 import { Button } from './ui/button';
 import { Calendar, Clock, PlusCircle, Trash } from '@phosphor-icons/react';
 import { Separator } from '@radix-ui/react-separator';
@@ -10,17 +10,13 @@ interface SidebarProps {
 
 const Sidebar = ({ setCurrentView }: SidebarProps) => {
   const [width, setWidth] = useState(256); // Default width in pixels
- 
-  const [newListName, setNewListName] = useState('');
-  const [emoji, setEmoji] = useState('');
-  const [lists, setLists] = useState<string[]>([]);
   const [selectedNav, setSelectedNav] = useState('Today');
 
-  const handleMouseDown = (e: { clientX: any; }) => {
+  const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     const startX = e.clientX;
     const startWidth = width;
 
-    const onMouseMove = (e: { clientX: number; }) => {
+    const onMouseMove = (e: MouseEvent) => {
       const newWidth = startWidth + (e.clientX - startX);
       if (newWidth >= 256) { // Minimum width
         setWidth(newWidth);
@@ -28,11 +24,11 @@ const Sidebar = ({ setCurrentView }: SidebarProps) => {
     };
 
     const onMouseUp = () => {
-      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mousemove', onMouseMove as unknown as EventListener);
       document.removeEventListener('mouseup', onMouseUp);
     };
 
-    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mousemove', onMouseMove as unknown as EventListener);
     document.addEventListener('mouseup', onMouseUp);
   };
 
@@ -40,7 +36,6 @@ const Sidebar = ({ setCurrentView }: SidebarProps) => {
     setSelectedNav(view);
     setCurrentView(view);
   };
-
 
   return (
     <div
@@ -50,7 +45,7 @@ const Sidebar = ({ setCurrentView }: SidebarProps) => {
       <div className="flex justify-between items-center mb-6">
         <Avatar className="border-2 border-white">
           <AvatarFallback>SS</AvatarFallback>
-          </Avatar>
+        </Avatar>
         <h2 className="text-xl font-semibold text-black">Private</h2>
         <Button variant="ghost" size="icon" className="text-black"><PlusCircle size={32} weight='fill'/></Button>
       </div>
