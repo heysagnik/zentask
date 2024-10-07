@@ -1,11 +1,20 @@
 import { useState } from 'react';
 import { Button } from './ui/button';
-import { Plus } from 'lucide-react';
+import { Calendar, Clock, PlusCircle, Trash } from '@phosphor-icons/react';
 import { Separator } from '@radix-ui/react-separator';
 import { Avatar, AvatarFallback } from './ui/avatar';
 
-const Sidebar = () => {
+interface SidebarProps {
+  setCurrentView: (view: string) => void;
+}
+
+const Sidebar = ({ setCurrentView }: SidebarProps) => {
   const [width, setWidth] = useState(256); // Default width in pixels
+ 
+  const [newListName, setNewListName] = useState('');
+  const [emoji, setEmoji] = useState('');
+  const [lists, setLists] = useState<string[]>([]);
+  const [selectedNav, setSelectedNav] = useState('Today');
 
   const handleMouseDown = (e: { clientX: any; }) => {
     const startX = e.clientX;
@@ -27,26 +36,47 @@ const Sidebar = () => {
     document.addEventListener('mouseup', onMouseUp);
   };
 
+  const handleNavClick = (view: string) => {
+    setSelectedNav(view);
+    setCurrentView(view);
+  };
+
+
   return (
     <div
       className="relative bg-white p-6 shadow-md rounded-lg ml-4 overflow-auto mt-4 mb-4"
       style={{ width: `${width}px` }}
     >
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Private</h2>
-        <Button variant="ghost" size="icon"><Plus className="h-4 w-4" /></Button>
+        <Avatar className="border-2 border-white">
+          <AvatarFallback>SS</AvatarFallback>
+          </Avatar>
+        <h2 className="text-xl font-semibold text-black">Private</h2>
+        <Button variant="ghost" size="icon" className="text-black"><PlusCircle size={32} weight='fill'/></Button>
       </div>
       <nav>
-        {['Home', 'Completed', 'Personal', 'Work', 'Diet', 'List of Book', 'Road trip list'].map((item, index) => (
-          <div key={index} className="flex items-center justify-between py-2">
-            <span>{item}</span>
-            <span className="text-gray-400">{Math.floor(Math.random() * 10) + 1}</span>
-          </div>
-        ))}
+        <Button
+          variant="ghost"
+          className={`flex items-start justify-start py-2 w-full mt-4 ${selectedNav === 'Today' ? 'text-black bg-gray-200' : 'text-black'}`}
+          onClick={() => handleNavClick('Today')}
+        >
+          {selectedNav === 'Today' ? <Calendar className="h-5 w-5 mr-2" weight='fill' /> : <Calendar className="h-5 w-5 mr-2" />} Today
+        </Button>
+        <Button
+          variant="ghost"
+          className={`flex items-start justify-start py-2 w-full mt-4 ${selectedNav === 'Schedule' ? 'text-black bg-gray-200' : 'text-black'}`}
+          onClick={() => handleNavClick('Schedule')}
+        >
+          {selectedNav === 'Schedule' ? <Clock className="h-5 w-5 mr-2" weight='fill' /> : <Clock className="h-5 w-5 mr-2" />} Schedule
+        </Button>
+        <Button
+          variant="ghost"
+          className={`flex items-start justify-start py-2 w-full mt-4 ${selectedNav === 'Trash' ? 'text-black bg-gray-200' : 'text-black'}`}
+          onClick={() => handleNavClick('Trash')}
+        >
+          {selectedNav === 'Trash' ? <Trash className="h-5 w-5 mr-2" weight='fill' size={32} /> : <Trash className="h-5 w-5 mr-2" />} Trash
+        </Button>
       </nav>
-      <Button variant="outline" className="w-full mt-4">
-        <Plus className="h-4 w-4 mr-2" /> Create new list
-      </Button>
       <Separator className="my-6" />
       
       <div
