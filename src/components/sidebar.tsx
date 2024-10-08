@@ -3,12 +3,9 @@ import { Button } from './ui/button';
 import { Calendar, Clock, PlusCircle, Trash } from '@phosphor-icons/react';
 import { Separator } from '@radix-ui/react-separator';
 import { Avatar, AvatarFallback } from './ui/avatar';
+import Link from 'next/link';
 
-interface SidebarProps {
-  setCurrentView: (view: string) => void;
-}
-
-const Sidebar = ({ setCurrentView }: SidebarProps) => {
+const Sidebar = () => {
   const [width, setWidth] = useState(256); // Default width in pixels
   const [selectedNav, setSelectedNav] = useState('Today');
 
@@ -34,7 +31,6 @@ const Sidebar = ({ setCurrentView }: SidebarProps) => {
 
   const handleNavClick = (view: string) => {
     setSelectedNav(view);
-    setCurrentView(view);
   };
 
   return (
@@ -50,27 +46,33 @@ const Sidebar = ({ setCurrentView }: SidebarProps) => {
         <Button variant="ghost" size="icon" className="text-black"><PlusCircle size={32} weight='fill'/></Button>
       </div>
       <nav>
-        <Button
-          variant="ghost"
-          className={`flex items-start justify-start py-2 w-full mt-4 ${selectedNav === 'Today' ? 'text-black bg-gray-200' : 'text-black'}`}
-          onClick={() => handleNavClick('Today')}
-        >
-          {selectedNav === 'Today' ? <Calendar className="h-5 w-5 mr-2" weight='fill' /> : <Calendar className="h-5 w-5 mr-2" />} Today
-        </Button>
-        <Button
-          variant="ghost"
-          className={`flex items-start justify-start py-2 w-full mt-4 ${selectedNav === 'Schedule' ? 'text-black bg-gray-200' : 'text-black'}`}
-          onClick={() => handleNavClick('Schedule')}
-        >
-          {selectedNav === 'Schedule' ? <Clock className="h-5 w-5 mr-2" weight='fill' /> : <Clock className="h-5 w-5 mr-2" />} Schedule
-        </Button>
-        <Button
-          variant="ghost"
-          className={`flex items-start justify-start py-2 w-full mt-4 ${selectedNav === 'Trash' ? 'text-black bg-gray-200' : 'text-black'}`}
-          onClick={() => handleNavClick('Trash')}
-        >
-          {selectedNav === 'Trash' ? <Trash className="h-5 w-5 mr-2" weight='fill' size={32} /> : <Trash className="h-5 w-5 mr-2" />} Trash
-        </Button>
+        <Link href="/tasks/today">
+          <Button
+            variant="ghost"
+            className={`flex items-start justify-start py-2 w-full mt-4 ${selectedNav === 'Today' ? 'text-black bg-gray-200' : 'text-black'}`}
+            onClick={() => handleNavClick('Today')}
+          >
+            {selectedNav === 'Today' ? <Calendar className="h-5 w-5 mr-2" weight='fill' /> : <Calendar className="h-5 w-5 mr-2" />} Today
+          </Button>
+        </Link>
+        <Link href="/tasks/schedule">
+          <Button
+            variant="ghost"
+            className={`flex items-start justify-start py-2 w-full mt-4 ${selectedNav === 'Schedule' ? 'text-black bg-gray-200' : 'text-black'}`}
+            onClick={() => handleNavClick('Schedule')}
+          >
+            {selectedNav === 'Schedule' ? <Clock className="h-5 w-5 mr-2" weight='fill' /> : <Clock className="h-5 w-5 mr-2" />} Schedule
+          </Button>
+        </Link>
+        <Link href="/tasks/trash">
+          <Button
+            variant="ghost"
+            className={`flex items-start justify-start py-2 w-full mt-4 ${selectedNav === 'Trash' ? 'text-black bg-gray-200' : 'text-black'}`}
+            onClick={() => handleNavClick('Trash')}
+          >
+            {selectedNav === 'Trash' ? <Trash className="h-5 w-5 mr-2" weight='fill' size={32} /> : <Trash className="h-5 w-5 mr-2" />} Trash
+          </Button>
+        </Link>
       </nav>
       <Separator className="my-6" />
       
