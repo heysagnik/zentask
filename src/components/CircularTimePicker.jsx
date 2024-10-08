@@ -1,10 +1,19 @@
 "use client";
 import React, { useState, useRef } from "react";
 
-const CircularTimePicker = ({ onSelectTime, onDone }) => {
+const CircularTimePicker = ({ onSelectTime, onDone, defaultQuadrant }) => {
   const [selectedHour, setSelectedHour] = useState(0);
   const [selectedMinute, setSelectedMinute] = useState(0);
   const [isAM, setIsAM] = useState(true);
+
+  const handleTimeSelect = () => {
+    const formattedHour = isAM ? selectedHour % 12 : (selectedHour % 12) + 12;
+    const time = `${formattedHour.toString().padStart(2, "0")}:${selectedMinute.toString().padStart(2, "0")}`;
+
+    onSelectTime(time, defaultQuadrant);
+    onDone();
+  };
+
   const hourHandRef = useRef(null);
   const minuteHandRef = useRef(null);
   const radius = 150;
@@ -29,35 +38,28 @@ const CircularTimePicker = ({ onSelectTime, onDone }) => {
 
   const handleHourDrag = (event) => {
     const angle = getAngleFromEvent(event, hourHandRef);
-    const hour = Math.round(angle / 30) % 12;
+    let hour = Math.round(angle / 30) % 12;
+    if (hour === 0) hour = 12;
     setSelectedHour(hour);
-    onSelectTime(`${hour.toString().padStart(2, "0")}:${selectedMinute.toString().padStart(2, "0")}`);
+    updateSelectedTime(hour, selectedMinute);
   };
 
   const handleMinuteDrag = (event) => {
     const angle = getAngleFromEvent(event, minuteHandRef);
     const minute = Math.round(angle / 6) % 60;
     setSelectedMinute(minute);
-    onSelectTime(`${selectedHour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`);
+    updateSelectedTime(selectedHour, minute);
   };
 
-  const handleHourChange = (e) => {
-    const hour = parseInt(e.target.value);
-    setSelectedHour(hour);
-    onSelectTime(`${hour.toString().padStart(2, "0")}:${selectedMinute.toString().padStart(2, "0")}`);
-  };
-
-  const handleMinuteChange = (e) => {
-    const minute = parseInt(e.target.value);
-    setSelectedMinute(minute);
-    onSelectTime(`${selectedHour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`);
+  const updateSelectedTime = (hour, minute) => {
+    const adjustedHour = isAM ? hour % 12 : hour % 12 + 12;
+    onSelectTime(`${adjustedHour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`);
   };
 
   const toggleAMPM = () => {
-    setIsAM(!isAM);
-    onSelectTime(
-      `${selectedHour.toString().padStart(2, "0")}:${selectedMinute.toString().padStart(2, "0")} ${isAM ? "PM" : "AM"}`
-    );
+    setIsAM((prev) => !prev);
+    const adjustedHour = isAM ? selectedHour % 12 + 12 : selectedHour % 12;
+    onSelectTime(`${adjustedHour.toString().padStart(2, "0")}:${selectedMinute.toString().padStart(2, "0")}`);
   };
 
   const hourHandStyle = {
@@ -105,7 +107,7 @@ const CircularTimePicker = ({ onSelectTime, onDone }) => {
   });
 
   const minuteMarkers = [...Array(60)].map((_, index) => {
-    const angle = index * 6; // 6 degrees per minute
+    const angle = index * 6;
     const { x, y } = calculatePosition(angle, radius - 20);
     return (
       <div
@@ -150,20 +152,20 @@ const CircularTimePicker = ({ onSelectTime, onDone }) => {
         />
       </div>
       <div className="flex items-center mt-4">
-        <select onChange={handleHourChange} value={selectedHour}>
+        <select onChange={(e) => setSelectedHour(parseInt(e.target.value))} value={selectedHour}>
           {Array.from({ length: 12 }, (_, i) => (
             <option key={i} value={i}>{i === 0 ? 12 : i}</option>
           ))}
         </select>
         :
-        <select onChange={handleMinuteChange} value={selectedMinute}>
+        <select onChange={(e) => setSelectedMinute(parseInt(e.target.value))} value={selectedMinute}>
           {Array.from({ length: 60 }, (_, i) => (
             <option key={i} value={i}>{i.toString().padStart(2, "0")}</option>
           ))}
         </select>
         <button onClick={toggleAMPM}>{isAM ? "AM" : "PM"}</button>
       </div>
-      <button onClick={onDone} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
+      <button onClick={handleTimeSelect} className="mt-4 bg-blue-500 text-white px-4 py-2 rounded">
         Done
       </button>
     </div>

@@ -42,16 +42,27 @@ const EisenhowerMatrix = () => {
     const copyListItems = [...todos];
     const dragItemContent = copyListItems[dragItem.current];
 
+
     if (dragItemContent.quadrant === "delete" && quadrant !== "delete") {
       return;
     }
 
+    if (quadrant === "schedule") {
+      if (!dragItemContent.time) {
+        setTimePickerTodoIndex(dragItem.current);
+        setShowTimePicker(true);
+        return;
+      }
+    }
+
+    if (quadrant === "do" && dragItemContent.time) {
+      return;
+    }
+
     dragItemContent.quadrant = quadrant;
+
     if (quadrant === "delete") {
       dragItemContent.completed = true;
-    } else if (quadrant === "schedule" && !dragItemContent.time) {
-      setTimePickerTodoIndex(dragItem.current);
-      setShowTimePicker(true);
     } else if (quadrant === "do") {
       dragItemContent.time = "";
     }
@@ -62,7 +73,6 @@ const EisenhowerMatrix = () => {
         ? copyListItems.length
         : dragOverItem.current;
     copyListItems.splice(newPosition, 0, dragItemContent);
-
     dragItem.current = null;
     dragOverItem.current = null;
     setTodos(copyListItems);
@@ -70,7 +80,7 @@ const EisenhowerMatrix = () => {
 
   const handleAddTodo = () => {
     if (newTodo.trim() !== "") {
-      const quadrant = selectedTime ? "schedule" : "do";
+      const quadrant = selectedTime ? "schedule" : "do"; // Set quadrant based on selected time
       setTodos([
         ...todos,
         { text: newTodo, completed: false, quadrant, time: selectedTime },
@@ -88,6 +98,12 @@ const EisenhowerMatrix = () => {
     setTodos(newTodos);
   };
 
+  //   const handleDeleteTodo = (index) => {
+  //     const newTodos = [...todos];
+  //     newTodos.splice(index, 1);
+  //     setTodos(newTodos);
+  //   };
+
   const handleDeleteAll = () => {
     const newTodos = todos.filter((todo) => todo.quadrant !== "delete");
     setTodos(newTodos);
@@ -96,14 +112,15 @@ const EisenhowerMatrix = () => {
   const handleTimePickerDone = () => {
     if (timePickerTodoIndex !== null) {
       const newTodos = [...todos];
-      newTodos[timePickerTodoIndex].time = selectedTime || "12:00"; // Default time if none is set
+      // Here you could consider the default time if not set
+      newTodos[timePickerTodoIndex].time = selectedTime || "15:40";
+      // Set quadrant to 'schedule' after selecting time
+      newTodos[timePickerTodoIndex].quadrant = "schedule";
       setTodos(newTodos);
       setTimePickerTodoIndex(null);
     }
     setShowTimePicker(false);
-    setSelectedTime("");
   };
-  
 
   const renderQuadrant = (title, quadrant) => (
     <div
@@ -174,6 +191,8 @@ const EisenhowerMatrix = () => {
         <h2 className="text-gray-500">Non-urgent</h2>
       </div>
       <div className="flex-grow grid grid-cols-2 grid-rows-2 gap-2 overflow-hidden">
+        {" "}
+        {/* Adjusted gap */}
         <div className="flex flex-col">
           {renderQuadrant("Do", "do")}
           {renderQuadrant("Delegate", "delegate")}
@@ -227,15 +246,33 @@ const EisenhowerMatrix = () => {
           </div>
         </div>
       </div>
-
       {showTimePicker && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-gray-100 w-[80vw] h-[70vh] p-8 rounded-lg flex flex-col">
             <h2 className="text-2xl font-bold mb-4 text-center">Select Time</h2>
-            <div className="inset-0 flex items-center justify-center bg-gray-100 bg-opacity-50 p-4">
+            <div className="flex items-center justify-center bg-gray-100 bg-opacity-50 p-4">
               <CircularTimePicker
-                onSelectTime={(time) => setSelectedTime(time)}
+                onSelectTime={(time) => {
+                  setSelectedTime(time);
+                  if (newTodo.trim() !== "") {
+                    // Assign to the 'schedule' quadrant when time is selected
+                    setTodos([
+                      ...todos,
+                      {
+                        text: newTodo,
+                        completed: false,
+                        quadrant: "schedule",
+                        time,
+                      },
+                    ]);
+                    setNewTodo("");
+                    setShowCheckIcon(false);
+                    setSelectedTime("");
+                    setShowTimePicker(false);
+                  }
+                }}
                 onDone={handleTimePickerDone}
+                defaultQuadrant="schedule"
               />
             </div>
           </div>
@@ -246,5 +283,3 @@ const EisenhowerMatrix = () => {
 };
 
 export default EisenhowerMatrix;
-
-
