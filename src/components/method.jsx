@@ -223,6 +223,8 @@ const EisenhowerMatrix = () => {
             <h2 className="text-lg font-bold mb-4 text-center">Select Time</h2>
             <TimePicker
               onChange={(time) => {
+                if (!time) return;
+
                 setSelectedTime(time);
                 if (newTodo.trim() !== '') {
                   setTodos([...todos, { text: newTodo, completed: false, quadrant: 'schedule', time }]);
